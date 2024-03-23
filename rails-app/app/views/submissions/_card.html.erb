@@ -1,0 +1,56 @@
+<% random_id = SecureRandom.random_number(10000000) %>
+<%#= link_to submission_path(submission) do %>
+<%= link_to submission_dialectica_id_path(submission.dialectica_id.to_s) do %>
+<div id="submission-<%= submission.id %> submission-<%= submission.id %>-random-id-<%= random_id %>" class="card mb-3 <%= submission.submission_urgency %> <%= submission.get_frame_status_color(current_user) %> <%= "animate__animated animate__shakeX animate__slow animate__repeat-2" if submission.suggested_to_me?(current_user) %> btn btn-light pool-select-button" style="height: 300px; font-size: 0.9rem;" value="<%=submission.id%>" data-cy="submission_card">
+  <div class="card-body">
+    <p class="card-text">
+      <strong>#<%= submission.dialectica_id_public %> - <%= l submission.created_at, format: :usa %></strong>
+    </p>
+    <hr class="bg-light" />
+    <p class="card-text">
+      <strong><%= submission.title.truncate(100) %></strong>
+    </p>
+    <% if !current_user.blank? && !SuggestionSubmission.where(user_id: current_user.id).where(submission_id: submission.id).empty? %>
+      <h5><span class="badge badge-pill badge-info text-white">suggested to you</span></h5>
+    <% end %>
+    <% if submission.accepted == "true" %>
+      <h5><span class="badge badge-pill badge-success text-white">accepted</span></h5>
+    <% elsif submission.proposed_for_acceptance == "true" %>
+      <h5><span class="badge badge-pill badge-success text-white text-wrap">proposed for acceptance</span></h5>
+    <% end %>
+
+    <% if submission.rejected == "true" %>
+      <h5><span class="badge badge-pill badge-danger text-white">rejected</span></h5>
+    <% elsif submission.proposed_for_rejection == "true" %>
+      <h5><span class="badge badge-pill badge-danger text-white text-wrap">proposed for rejection</span></h5>
+    <% end %>
+
+    <% if submission.proposed_for_discussion == "true" %>
+      <h5><span class="badge badge-pill badge-info text-white">discussion</span></h5>
+    <% end %>
+
+    <% if submission.withdrawn == "true" %>
+      <h5><span class="badge badge-pill badge-danger text-white">withdrawn</span></h5>
+    <% elsif submission.withdrawn == "false" %>
+
+    <% end %>
+
+    <% unless submission.resubmit_original_dialectica_id.blank? %>
+      <h6><span class="badge badge-pill badge-info text-white">re-submission of <br><%= submission.resubmit_original_dialectica_id %> </span></h6>
+    <% else %>
+
+    <% end %>
+
+    <% if false #submission.dead == "true" %>
+    <p class="card-text">
+      <strong><%= submission.firstname %> <%= submission.lastname %></strong>
+    </p>
+    <% end %>
+    <% if false %>
+      <button type="button" class="btn btn-light pool-select-button" value="<%=submission.id%>">Select</button>
+      <%#= render 'submissions/panel', submission: submission, random_id: SecureRandom.random_number(10000000) %>
+    <% end %>
+
+  </div>
+</div>
+<% end %>

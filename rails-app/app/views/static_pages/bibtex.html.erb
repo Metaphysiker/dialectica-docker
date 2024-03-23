@@ -1,0 +1,40 @@
+<% cp = CiteProc::Processor.new style: 'apa', format: 'html' %>
+<% cp.import BibTeX.open('./public/bibtex/dialectica-sandro.bib').to_citeproc %>
+<%# cp.import BibTeX.open('./public/bibtex/biblio.bib').to_citeproc %>
+<% array_of_ids = [] %>
+<% @b['@article'].each do |article| %>
+  <% array_of_ids.push(article.id) %>
+<% end %>
+
+
+<div class="container">
+
+
+
+  <h3>Searching DOI with CrossRef-API (random example from bib-file)</h3>
+  <p>
+  <i>Reload page to get another random example.</i>
+  </p>
+  <% array_of_ids.sample(1).each do |id| %>
+  <% citation = raw (cp.render :bibliography, id: id).first %>
+  <% serrano = Serrano.works(query: citation) %>
+  <p>
+    <h3> Random Article </h3>
+    <%= citation %>
+    <%#= serrano.inspect %>
+  </p>
+  <br />
+    <p>
+    <h5>Found DOI-Links and their Citation Counts</h5>
+    <% serrano["message"]["items"].first(10).each do |item|%>
+    <p>
+      <%= Serrano.content_negotiation(ids: item["DOI"], format: "text", style: "elsevier-harvard").force_encoding(Encoding::UTF_8) %>
+    <br />
+      <%=  link_to item["URL"], item["URL"]  %> - <strong>Citation Count: </strong><%= item["is-referenced-by-count"] %><br />
+    </p>
+
+    <% end %>
+    </p>
+  <% end %>
+
+</div>

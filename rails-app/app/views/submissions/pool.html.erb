@@ -1,0 +1,87 @@
+<%= render "layouts/fishpond_navigation" %>
+
+<div class="container-fluid">
+
+  <div class="row">
+    <div class="col-sm-12 col-md-9">
+      <h3>welcome to the fishpond</h3>
+        <%= render "submissions/searchable_cards", submissions: SubmissionSearch.new("", "all", current_user.id).search() %>
+      </div>
+      <div class="col-sm-12 col-md-3">
+        <h5>manual</h5>
+        <p>
+        <ul>
+          <li>
+            click on a fish to see its history
+          </li>
+          <li>
+            "fish" it to become an internal reviewer
+          </li>
+          <li>
+             suggest some fish to others
+          </li>
+          <li>
+            build a case for one of them
+          </li>
+          <li>
+            "propose" it to put it on the EC's menu
+          </li>
+        </ul>
+        </p>
+        <h5 class="mt-5">latest activities - <%= link_to "show all", histories_path %></h5>
+        <div class="overflow-auto small" style="height: 8000px;">
+          <% @histories.each do |history| %>
+            <p>
+              <% unless history.submission.blank? %>
+                #<%= link_to history.submission.dialectica_id_public, submission_path(history.submission) %> - "<%= link_to history.submission.title, submission_path(history.submission) %>"
+              <% end %>
+            </p>
+            <%= render 'histories/show', history: history, collapse_status: "" %>
+            <hr />
+          <% end %>
+        </div>
+      </div>
+      </div>
+      <hr />
+
+<p>
+
+</p>
+<%#= render 'submissions/card', submission: Submission.last %>
+
+<%#= render 'submissions/in_groups', submissions: Submission.all %>
+
+<% submissions_without_reviewers = Submission.left_outer_joins(:users).where( users: { id: nil } ) %>
+<% submissions_with_reviewers = Submission.where.not(id: submissions_without_reviewers.pluck(:id)) %>
+
+</div>
+
+<%= render "layouts/footer" %>
+
+<script>
+
+  $( document ).ready(function() {
+
+    $(document).on('click', '.pool-select-button', function() {
+
+      submission_id = $(this).attr("value");
+
+      window.location.href = "/submissions/" + submission_id;
+
+      //console.log(submission_id);
+
+      //$.ajax({
+      //  url: "/submission_panel/" + submission_id + ".js",
+      //  method: 'GET',
+      //  headers: {
+      //    'X-CSRF-Token': document.querySelector("meta[name=csrf-token]").content
+      //  }
+      //}).done(function(response) {
+      //$("#panel-information-field").html(response);
+    //})
+
+    });
+  });
+
+
+</script>

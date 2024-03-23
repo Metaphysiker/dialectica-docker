@@ -1,0 +1,11 @@
+convert_urls: true
+relative_urls: false
+remove_script_host: false
+document_base_url: https://fishpond.philosophie.ch/
+menubar: false
+toolbar:
+  - styleselect | bold italic | undo redo | link | table | code | alignleft | aligncenter | alignjustify
+plugins:
+  - link
+  - table
+  - code

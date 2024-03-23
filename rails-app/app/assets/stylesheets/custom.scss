@@ -1,0 +1,122 @@
+$first-color: #164da2;
+
+$colors: (
+  //light-green: #90EE90,
+  light-green: #92E675,
+  dark-green: #32CD32,
+  light-red: #C44B3F,
+  dark-red: #DC143C,
+  violet: #FF1493,
+  dark-grey: #A9A9A9,
+  black: #000000,
+  dialectica-blue: #164DA2,
+  yellow: #F4E95C,
+  orange: #F89952
+);
+
+$yellow-colors: (
+  light-yellow: #fdfd96,
+  dark-yellow: #FAFA0F
+);
+
+@for $i from 1 through 10 {
+  .thick-borders-#{$i}{
+    border-width: #{$i}px !important;
+  }
+}
+
+@mixin color-modifiers {
+  @each $name, $hex in $colors {
+    &-#{$name} {
+      background-color: $hex !important;
+    }
+
+  //  &-#{$name}:hover {
+  //    background-color: lighten($hex, 10%) !important;
+    //}
+
+    &-#{$name}:hover {
+      transform: scale(1.09); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+      background-color: lighten($hex, 10%) !important;
+    }
+
+    // &-#{$name}:hover {
+    //  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    //  transform: translate3d(0, 0, 0);
+    //  backface-visibility: hidden;
+    //  perspective: 1000px;
+    // }
+  }
+}
+
+@mixin color-backgrounds {
+  @each $name, $hex in $yellow-colors {
+    &-#{$name} {
+      border-color: $hex !important;
+      border-radius: 25px;
+      border: 2px;
+    }
+  }
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+.bg-color {
+  @include color-modifiers;
+}
+
+.border {
+  @include color-backgrounds;
+}
+
+.bg-first-color {
+  background-color: $first-color;
+}
+
+.embed-responsive-210by297 {
+  padding-bottom: 141.42%;
+}
+
+blockquote{
+  font-size: 1.4em;
+  width:60%;
+  margin:50px auto;
+  font-family:Open Sans;
+  font-style:italic;
+  color: #555555;
+  padding:1.2em 5px 1.2em 10px;
+  border-left:8px solid #78C0A8 ;
+  line-height:1.6;
+  position: relative;
+  background:#EDEDED;
+}
+
+.arrow-animation {
+  //transform: rotate(45deg);
+  transform: rotate(0deg);
+}
+
+.arrow-animation.show {
+  //transform: rotate(45deg);
+  transform: rotate(90deg);
+}
+
+.arrow-animation.collapsed {
+  transform: rotate(0deg);
+}

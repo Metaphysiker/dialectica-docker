@@ -1,0 +1,12 @@
+
+var div_element = ".submissions_searchable_list";
+
+$( div_element ).fadeOut( "fast", function() {
+
+    content = $("<%= escape_javascript( render 'submissions/table_for_submissions', submissions: @submissions ) %>")
+
+    $(div_element).replaceWith(function(){
+      return $(content).hide().fadeIn("fast");
+    });
+
+});

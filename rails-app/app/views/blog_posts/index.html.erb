@@ -1,0 +1,19 @@
+<div class="container">
+  <div class="jumbotron bg-white my-4">
+    <div class="text-center">
+      <h1 class="my-4"><%= @category %></h1>
+    </div>
+      <div class="text-center">
+        <% if user_signed_in? %>
+          <%= link_to 'New Entry', new_blog_post_path(category: @category), class: "btn btn-primary my-2" %>
+        <% end %>
+      </div>
+      <hr />
+    <%#= render "blog_posts/search_form", blog_posts: @blog_posts %>
+    <h3 class="text-center">latest entries</h3>
+    <div class="blog_posts">
+      <%#= render partial: "blog_posts/show", collection: @blog_posts, as: :blog_post %>
+      <%= render 'blog_posts_in_groups_of_3', blog_posts: @blog_posts %>
+    </div>
+  </div>
+</div>

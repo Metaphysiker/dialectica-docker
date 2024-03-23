@@ -1,0 +1,68 @@
+<div class="container-fluid">
+
+  <div class="row">
+    <div class="col-9 border-right">
+      <h3><i>dialectica</i> Editorial Committee </h3>
+      <p>
+        <% submission_option_list = [
+        ["submissions without reviewers: #{@submissions_without_reviewers.count} (#{@submissions_without_reviewers.order(:id).map(&:id).join(",")})", "without_reviewers"],
+        ["submissions with reviewers: #{@submissions_with_reviewers.count}", "with_reviewers"],
+        ["submissions to be reviewed by me: #{@submissions_to_be_reviewed_by_me.count}  (#{@submissions_to_be_reviewed_by_me.order(:id).map(&:id).join(",")})", "by_me"],
+        ["submissions suggested to me: #{@submissions_suggested_to_me.count}", "suggested_to_me"],
+        ["proposed submissions: #{@proposed_submissions.count}", "proposed_submissions"],
+        ["all open submissions: #{@all_submissions.count}", "all"],
+        ["dead submissions: #{@dead_submissions.count}", "dead_submissions"]
+        ] %>
+        <div class="small">
+          <% submission_option_list.each do |element| %>
+            <a href="<%= submission_pool_path(selection: element[1]) %>" class="<%= "p-1 rounded bg-primary text-white" if @selection == element[1] %>"><%= element[0] %></a><br />
+          <% end %>
+        </div>
+      </p>
+      <hr />
+      <%= render 'submissions/in_groups', submissions: @submissions %>
+    </div>
+    <div class="col-3">
+      <div id="panel-information-field" class="border rounded p-2">
+        <p>
+          <strong>Select an entry on the left side to display more information.</strong>
+        </p>
+      </div>
+    </div>
+  </div>
+
+<p>
+
+</p>
+<%#= render 'submissions/card', submission: Submission.last %>
+
+<%#= render 'submissions/in_groups', submissions: Submission.all %>
+
+<% submissions_without_reviewers = Submission.left_outer_joins(:users).where( users: { id: nil } ) %>
+<% submissions_with_reviewers = Submission.where.not(id: submissions_without_reviewers.pluck(:id)) %>
+
+</div>
+
+<script>
+
+  $( document ).ready(function() {
+
+    $(document).on('click', '.pool-select-button', function() {
+      submission_id = $(this).attr("value");
+      //console.log(submission_id);
+
+      $.ajax({
+        url: "/submission_panel/" + submission_id + ".js",
+        method: 'GET',
+        headers: {
+          'X-CSRF-Token': document.querySelector("meta[name=csrf-token]").content
+        }
+      }).done(function(response) {
+      $("#panel-information-field").html(response);
+    })
+
+    });
+  });
+
+
+</script>

@@ -1,0 +1,97 @@
+<table class="table table-bordered">
+  <% dois.each do |doi| %>
+    <tr>
+      <td>@article{</td>
+      <td>
+        <%= doi.first["message"]["author"][0]["family"].downcase %>_<%= doi.first["message"]["author"][0]["given"].chars.first.downcase %>:<%= doi.first["message"]["indexed"]["date-parts"][0][0] %>
+      </td>
+      <td>,</td>
+      <td>author = {</td>
+      <td>
+        <% author1 = doi.first["message"]["author"][0] %>
+        <% unless author1.blank? %>
+          <%= author1["family"] %>, <%= author1["given"] %>
+        <% end %>
+      </td>
+      <td>
+        <% author2 = doi.first["message"]["author"][1] %>
+        <% unless author2.blank? %>
+          <%= author2["family"] %>, <%= author2["given"] %>
+        <% end %>
+      </td>
+      <td>
+        <% doi.first["message"]["author"].drop(2).each do |author| %>
+          <%= author["family"] %>, <%= author["given"] %>,
+        <% end %>
+      </td>
+
+      <td>
+        },
+      </td>
+      <td>
+        year = {
+      </td>
+      <td>
+        <%= doi.first["message"]["published"]["date-parts"][0][0] %>
+      </td>
+      <td>
+        },
+      </td>
+      <td>
+        title = {
+      </td>
+      <td>
+        <%= doi.first["message"]["title"][0] %>
+      </td>
+      <td>
+        },
+      </td>
+      <td>
+        journal = {
+      </td>
+      <td>
+        <%= doi.first["message"]["container-title"][0] %>
+      </td>
+      <td>
+        },
+      </td>
+      <td>
+        volume = {
+      </td>
+      <td>
+        <%= doi.first["message"]["volume"] %>
+      </td>
+      <td>
+        },
+      </td>
+      <td>
+        number = {
+      </td>
+      <td>
+        <%= doi.first["message"]["journal-issue"]["issue"] %>
+      </td>
+      <td>
+        },
+      </td>
+      <td>
+        pages = {
+      </td>
+      <td>
+        <%= doi.first["message"]["page"].gsub(/-/,'--') %>
+      </td>
+      <td>
+        },
+      </td>
+      <td>
+        doi = {
+      </td>
+      <td>
+        <%= doi.first["message"]["DOI"] %>
+      </td>
+      <td>
+        },
+      </td>
+    </tr>
+  <% end %>
+
+</table>

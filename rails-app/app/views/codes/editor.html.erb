@@ -1,0 +1,129 @@
+<script src="https://cdn.jsdelivr.net/npm/showdown@1.9.1/dist/showdown.min.js" integrity="sha256-jl1+DOsSs9uABTKppOJ2GF8kXoc3XQzBtFFyS0i9Xoo=" crossorigin="anonymous"></script>
+<%= tinymce_assets %>
+<%#= tinymce %>
+
+<div class="container-fluid">
+  <h1>Markdown-Editor</h1>
+  <div class="row">
+    <div class="col-6">
+        <%#= form_for :inputs, url: "/editor/basic_markdown_editor", method: :post do |form| %>
+        <%#= form_for :inputs, path: codes_editor_post_path(@code), method: :post do |form| %>
+        <%= form_for :inputs, url: codes_update_editor_path(@code), method: :post, remote: true do |form| %>
+        <%= form.submit "Translate  & Save", class: "btn btn-primary" %>
+        <br />
+          <%#= form.text_area :text %>
+          <%#= form.text_area :text, :class => "markdown", :rows => 40, id: "markdown_text_area", style: 'width:100%;' %>
+
+            <p>
+              <strong>Name</strong><br />
+              <%= form.text_field :name, value: @code.name %>
+            </p>
+            <p>
+              <strong>Template</strong>
+              <%= form.select :template, options_for_select(Code.template_options.collect{ |u| [u, u] }) %>
+            </p>
+            <p>
+              <strong>Yaml</strong> (The spaces are important! Don't mess with the spaces!)
+            <%= form.text_area :yaml, id: "yaml_text_area", value: @code.yaml %>
+            </p>
+            <p>
+              <strong>Markdown</strong>
+              <%= form.text_area :text, id: "markdown_text_area", value: @code.content %>
+            </p>
+            <%#= form.submit "Translate", class: "" %>
+
+
+            <strong>References</strong>
+            <p>
+              Upload a BibTex-File and / or edit the Bibtex in the field below.
+            </p>
+            <p>
+              When you press "Translate", the content of the Bibtex-File and the Bibtex in the field merge together.
+            </p>
+            <p>
+              <%= form.submit "Translate & Save", class: "btn btn-primary" %>
+            </p>
+            <p>
+            <%= form.file_field :bibtexfile, class: "btn btn-secondary" %>
+            </p>
+            <%#= form.text_area :references, :class => "markdown", :rows => 20, id: "references_text_area", style: 'width:100%;' %>
+            <%= form.text_area :bibtex, id: "references_text_area", value: @code.bibtex %>
+
+          <% end %>
+          </div>
+          <div class="col-6">
+            <div id="error-field">
+              <% unless @stuff.error.blank? %>
+              <div class="alert alert-danger" role="alert">
+                ERROR!
+              </div>
+              <p>
+                <%= simple_format @stuff.error %>
+              </p>
+              <% end %>
+            </div>
+            <div id="pdf-field" class="embed-responsive" style="padding-bottom: 141.42%;">
+                <iframe  class="embed-responsive-item" src="<%= rails_blob_path(@stuff.file, disposition: "inline") unless @stuff.nil? %>"></iframe>
+            </div>
+            <p class="pt-2">
+              <%= link_to "Download Markdown and Bibtex (Make sure you saved it first)", codes_download_path(@code), class: "btn btn-primary" %>
+            </p>
+        </div>
+</div>
+</div>
+
+
+<script>
+
+  $( document ).ready(function() {
+    var myCodeMirror1 = CodeMirror.fromTextArea(document.getElementById("markdown_text_area"), {
+      theme: "default",
+      mode: 'markdown',
+      border: '1px solid #eee',
+      setsize: '100%'
+    });
+
+    myCodeMirror1.setSize("100%", "100%");
+
+    var myCodeMirror2 = CodeMirror.fromTextArea(document.getElementById("references_text_area"), {
+      theme: "default"
+    });
+
+    var myCodeMirror3 = CodeMirror.fromTextArea(document.getElementById("yaml_text_area"), {
+      theme: "default",
+      mode: 'yaml',
+      border: '1px solid #eee'
+    });
+
+
+    //tinyMCE.init({
+      //selector: 'textarea#markdown_text_area',
+    //  body_class: "",
+      //body_id : "markdown_tinymce_text_area",
+    //  menubar: "false",
+      //plugins: ["link", "table", "code", "lists"],
+      //toolbar: ["styleselect | bold italic | undo redo | link table | code | numlist bullist"]
+    //});
+
+    //var converter = new showdown.Converter();
+
+    //$( "#button_from_markdown_to_html" ).click(function() {
+      //translate();
+    //});
+
+    //tinymce.activeEditor.on('blur', function(e) {
+        //console.log(e.focusedEditor);
+        //translate();
+    //});
+
+    //function translate() {
+    //  var markdown = tinyMCE.activeEditor.getContent();
+    //  var html = converter.makeHtml(markdown);
+    //  $("#html_from_markdown_text_area").html(html);
+
+    //  var markdown2 = converter.makeMarkdown(html);
+    //  $("#markdown_from_html").val(markdown2);
+    //}
+
+  });
+</script>

@@ -1,0 +1,18 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Comment:</strong>
+  <%= @medium.comment %>
+</p>
+
+<p>
+  <strong>file:</strong>
+  <% if @medium.file.attached? %>
+    <%= link_to "download", rails_blob_path(@medium.file)  %> |
+    <%= link_to "url download", url_for(@medium.file)  %>
+
+  <% end %>
+</p>
+
+<%= link_to 'Edit', edit_medium_path(@medium) %> |
+<%= link_to 'Back', media_path %>

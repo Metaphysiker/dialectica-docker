@@ -1,0 +1,16 @@
+\documentclass[12pt,a4paper,sloppy]{article}
+<% @latex_config = { :recipe => [
+	{:command => 'pdflatex'},
+	{:command => 'bibtex', :arguments =>[]},
+	{:command => 'pdflatex', :runs => 2}
+]} # you can override the defaults if you wish; see LatexToPdf#config
+%>
+\usepackage{filecontents}
+\usepackage{lastpage}
+\usepackage{graphics}
+
+\begin{document}
+
+  <%= yield %>
+
+\end{document}

@@ -1,0 +1,55 @@
+<!-- blog_post Content -->
+ <div class="container">
+     <!-- Post Content Column -->
+     <%= link_to "Back", blog_posts_path(category: blog_post.category), class: "btn btn-light border my-2" %>
+       <% if is_user_admin?(current_user) %>
+        <%= link_to "Edit entry", edit_blog_post_path(blog_post), class: "btn btn-primary my-2" %>
+       <% end %>
+
+       <!-- Preview Image -->
+       <% if false %>
+          <%= image_tag blog_post.cover, class: "img-fluid  rounded" %>
+         <hr>
+       <% end %>
+
+       <!-- Title -->
+       <h1 class="mt-4 text-center"><%= blog_post.title %></h1>
+       <% unless blog_post.user.blank? %>
+         <p class="text-center">
+           <%= blog_post.user.name %>
+         </p>
+       <% end %>
+       <% unless blog_post.created_at.blank? %>
+         <p class="text-center">
+           <small class=""><%= l(blog_post.created_at, format: :long) %></small>
+           <br />
+         </p>
+       <% end %>
+       <hr>
+
+       <!-- Description and Keywords -->
+       <% unless blog_post.description.blank? %>
+         <p class="text-center text-justify mx-2">
+            <%= blog_post.description %>
+         </p>
+         <% unless blog_post.keywords.blank? %>
+           <p class="text-center text-justify mx-2">
+             <small class="text-muted"><strong>Keywords: </strong><%= blog_post.keywords %></small>
+           </p>
+         <% end %>
+         <hr>
+       <% end %>
+
+
+       <!-- Post Content -->
+       <div class="text-justify">
+             <%= raw Sanitize.fragment(blog_post.content, Sanitize::Config::RELAXED) %>
+        </div>
+
+       <hr>
+
+
+
+   <!-- /.row -->
+
+ </div>

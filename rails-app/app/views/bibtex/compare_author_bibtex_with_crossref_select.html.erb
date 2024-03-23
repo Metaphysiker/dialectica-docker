@@ -1,0 +1,212 @@
+<% cp = CiteProc::Processor.new style: 'apa', format: 'html' %>
+
+<div class="container-fluid">
+  <%#= @format_type %>
+  <h1>Select Bibtex-Entries</h1>
+  <hr />
+  <p>
+    Click on the entries you want. All selected bibtex-entries are in the textarea below. You can also edit them on the fly.
+    </p>
+  <p>
+    If something doesn't work or if you need something special, please contact me: <%= mail_to "sandro.raess@philosophie.ch", "sandro.raess@philosophie.ch" %>
+  </p>
+  <% if @format_type == "json" %>
+    <hr />
+    <p>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">Original</th>
+            <th scope="col">Crossref</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @array_of_originals.each do |bibtex_entry| %>
+            <tr>
+              <td>
+                <%= render 'jsons/json_view', json: bibtex_entry, select_option: true, selected: true %>
+                </td>
+              <td>
+                <% bibtex_entry.children.each do |child| %>
+                  <% unless child.blank? || child.id.blank? %>
+                  <%= render 'jsons/json_view', json: child, select_option: true %>
+                    <hr />
+                  <% end %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </p>
+  <% elsif @format_type == "bibtex" %>
+  <hr />
+  <p>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">Original</th>
+          <th scope="col">Crossref</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @array_of_originals.each do |bibtex_entry| %>
+          <tr>
+            <td>
+              <button type="button" class="btn btn-light text-left bibtex_entry bibtex_entry_id_<%= bibtex_entry.id %>" bibtex_entry_id="<%= bibtex_entry.id %>" >
+                <%#= bibtex_entry.content %>
+                <% bibtex_parse = BibTeX.parse(bibtex_entry.content) %>
+                <% bibtex_entry_cp = cp.import bibtex_parse.to_citeproc %>
+                <%= raw (bibtex_entry_cp.render :bibliography, id: bibtex_parse.first.id).first %>
+                <div class="child_of_button" style="display: none;" id="bibtex_entry_id_<%= bibtex_entry.id %>_content">
+                  <%= bibtex_entry.content %>
+                </div>
+              </button>
+              </td>
+            <td>
+              <%# bibtex_entry.children.each do |child| %>
+              <% Json.where(bibtex_entry_id: bibtex_entry.id).each do |child| %>
+                <% unless child.blank? || child.id.blank? %>
+
+                <%= render 'jsons/json_view', json: child, select_option: true %>
+                  <hr />
+
+                <% if false %>
+                  <button type="button" class="btn btn-light text-left bibtex_entry bibtex_entry_id_<%= bibtex_entry.id %>" bibtex_entry_id="<%= bibtex_entry.id %>">
+                    <%#= raw child.content %>
+                    <%# bibtex_parse = BibTeX.parse(child.content) %>
+                    <%# bibtex_entry_cp = cp.import bibtex_parse.to_citeproc %>
+                    <%#= bibtex_entry_cp.encoding %>
+                    <%#= raw (bibtex_entry_cp.render :bibliography, id: bibtex_parse.first.id).first unless bibtex_parse.blank? %>
+                    <div class="child_of_button" style="display: none;" id="bibtex_entry_id_<%= bibtex_entry.id %>_content">
+                      <%= child.content %>
+                    </div>
+                  </button>
+                  <hr />
+                  <% end %>
+                <% end %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </p>
+  <% elsif @format_type == "text" %>
+  <hr />
+  <p>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">Original</th>
+          <th scope="col">Crossref</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @array_of_originals.each do |bibtex_entry| %>
+          <tr>
+            <td>
+              <button type="button" class="btn btn-light text-left bibtex_entry bibtex_entry_id_<%= bibtex_entry.id %>" bibtex_entry_id="<%= bibtex_entry.id %>" >
+                  <%= bibtex_entry.content %>
+              </button>
+              </td>
+            <td>
+              <%# bibtex_entry.children.each do |child| %>
+              <% Json.where(bibtex_entry_id: bibtex_entry.id).each do |child| %>
+                <% unless child.blank? || child.id.blank? %>
+
+                <%= render 'jsons/json_view', json: child, select_option: true %>
+                  <hr />
+
+                <% if false %>
+                  <button type="button" class="btn btn-light text-left bibtex_entry bibtex_entry_id_<%= bibtex_entry.id %>" bibtex_entry_id="<%= bibtex_entry.id %>">
+                    <%#= raw child.content %>
+                    <%# bibtex_parse = BibTeX.parse(child.content) %>
+                    <%# bibtex_entry_cp = cp.import bibtex_parse.to_citeproc %>
+                    <%#= bibtex_entry_cp.encoding %>
+                    <%#= raw (bibtex_entry_cp.render :bibliography, id: bibtex_parse.first.id).first unless bibtex_parse.blank? %>
+                    <div class="child_of_button" style="display: none;" id="bibtex_entry_id_<%= bibtex_entry.id %>_content">
+                      <%= child.content %>
+                    </div>
+                  </button>
+                  <hr />
+                  <% end %>
+                <% end %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </p>
+  <% end %>
+
+  <p>
+    <strong>JSON</strong>
+      <textarea name="chosen_entries_for_json" id="chosen_entries_for_json" rows="30" style="width:100%;"></textarea>
+  </p>
+  <p>
+    <strong>Bibtex</strong>
+      <textarea name="chosen_entries_for_bibtex" id="chosen_entries_for_bibtex" rows="30" style="width:100%;"></textarea>
+  </p>
+
+</div>
+
+<script>
+
+  $( document ).ready(function() {
+
+    $(document).on('click', '.select_button_entry_comparator', function() {
+        json_view_ancestry_id = $(this).parent().attr("json_view_ancestry_id");
+        json_view_ancestry = ".json_view_ancestry_" + json_view_ancestry_id
+        console.log(json_view_ancestry);
+
+        if ($(this).hasClass('selected_entry_comparator')) {
+          $(json_view_ancestry).each(function() {
+            $(this).find(".select_button_entry_comparator").removeClass('selected_entry_comparator').removeClass("btn-success").removeClass("btn-light").addClass("btn-light").text("Select");
+          })
+        } else {
+          $(json_view_ancestry).each(function() {
+            $(this).find(".select_button_entry_comparator").removeClass('selected_entry_comparator').removeClass("btn-success").removeClass("btn-light").addClass("btn-light").text("Select");
+          })
+          $(this).addClass( 'selected_entry_comparator').removeClass("btn-light").addClass("btn-success");
+          $(this).text("Selected");
+        }
+
+        fill_chosen_entries();
+
+    });
+
+        fill_chosen_entries();
+  });
+
+  function get_apa_of_selected_entries(){
+    $('.selected_entry_comparator').each(function() {
+      console.log($(this).parent().find(".apa").text());
+      console.log($(this).parent().attr("json_view_id"))
+    })
+  }
+
+  function fill_chosen_entries() {
+    all_entries_for_json = ""
+    $('.selected_entry_comparator').each(function(index) {
+      //all_entries_for_json = all_entries_for_json + $.trim($(this).parent().find(".raw_json").text()) + ", ";
+
+      var isLastElement = index == $('.selected_entry_comparator').length -1;
+      if (isLastElement) {
+          all_entries_for_json = all_entries_for_json + $.trim($(this).parent().find(".raw_json").text());
+      } else {
+        all_entries_for_json = all_entries_for_json + $.trim($(this).parent().find(".raw_json").text()) + ", ";
+      }
+
+    })
+    $('#chosen_entries_for_json').val("[" + all_entries_for_json + "]");
+
+    all_entries_for_bibtex = ""
+    $('.selected_entry_comparator').each(function() {
+      all_entries_for_bibtex = all_entries_for_bibtex + "\n \n" + $.trim($(this).parent().find(".bibtex").text());
+    })
+    $('#chosen_entries_for_bibtex').val(all_entries_for_bibtex);
+  }
+
+</script>

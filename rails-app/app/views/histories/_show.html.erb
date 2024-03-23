@@ -1,0 +1,58 @@
+<% collapse_status = "" %>
+<% collapse_status = local_assigns[:collapse_status] if local_assigns[:collapse_status] %>
+
+<% history_name = "" %>
+
+<% if !history.alternative_name.blank? %>
+  <% history_name = history.alternative_name %>
+<% elsif history.blank? || history.submission.blank? || history.user.blank? || history.submission.submitted_by_user_id == history.user.id %>
+  <% history_name = "author" %>
+<% else %>
+  <% history_name = history.user.name unless history.user.blank? %>
+<% end %>
+
+<% if strip_tags(history.content).length < 100 %>
+<div class="history-<%= history.id %> small">
+
+    <strong>
+      <%= history_name %> - <%= l(history.created_at, format: :usa) %>
+    </strong>
+
+    <div class="card card-body">
+      <%= raw history.content %>
+    </div>
+
+</div>
+
+<% else %>
+
+<div class="history-<%= history.id %> small">
+  <p>
+    <button class="btn btn-light arrow-animation <%= collapse_status %> border" type="button" data-toggle="collapse" data-target="#collapse-history-<%= history.id %>" aria-expanded="true" aria-controls="collapse-history-<%= history.id %>">
+      <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-caret-right-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+      </svg>
+
+    </button>
+    <strong>
+      <%= history_name %> - <%= l(history.created_at, format: :usa) %>
+    </strong>
+  </p>
+  <%#= collapse_status %>
+  <div class="collapse <%= collapse_status %>" id="collapse-history-<%= history.id %>">
+    <div class="card card-body">
+      <%= raw history.content %>
+    </div>
+  </div>
+</div>
+
+<% end %>
+
+<div class="small">
+
+  <% if history.category == "comment" &&  (history.user == current_user || is_user_admin?(current_user) || is_user_editor?(current_user)) %>
+    <%= link_to 'edit', edit_history_path(history) %>
+    <%#= link_to 'delete', history, method: :delete, data: { confirm: 'Are you sure?' } %>
+  <% end %>
+
+  </div>

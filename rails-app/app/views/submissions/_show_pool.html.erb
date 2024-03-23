@@ -1,0 +1,102 @@
+<% if policy(:submission).show? %>
+  <%= link_to "back to the pool", submission_pool_path %>
+  <hr />
+  <%= render 'submissions/buttons', submission: submission %>
+  <hr />
+  <div class="row">
+    <div class="col-8">
+      <div id="pdf-field" class="embed-responsive" style="padding-bottom: 141.42%;">
+          <iframe  class="embed-responsive-item" src="<%= rails_blob_path(submission.file, disposition: "inline") unless submission.nil? || !submission.file.attached? %>"></iframe>
+          <% if submission.nil? || !submission.file.attached? %>
+            <strong>no file uploaded</strong>
+          <% end %>
+      </div>
+    </div>
+    <div class="col-4">
+      <h3>#<%= submission.dialectica_id_public %></h3>
+      <p>
+        <%= submission.title %>
+      </p>
+      <% unless submission.resubmit_original_dialectica_id.blank? || Submission.where(dialectica_id: submission.resubmit_original_dialectica_id).empty? %>
+        <%= link_to submission_dialectica_id_path(submission.resubmit_original_dialectica_id) do %>
+          <h6><span class="badge badge-pill badge-info text-white">re-submission of <br><%= submission.resubmit_original_dialectica_id %> </span></h6>
+        <% end %>
+      <% else %>
+
+      <% end %>
+      <hr>
+      <% if true %>
+      <br />
+      <%= render 'external_referee_submissions/requested_referees_for_submission', submission: submission %>
+      <% end %>
+      <% if false# submission.submitted_by_user_id.blank? %>
+      <div class="small">
+          <div class="card card-body">
+            <p>
+              Author - <%= l(submission.created_at, format: :usa) %>
+              <br>
+              submitted: "<%= submission.title %>"
+              <% if false %>
+                <br />
+                comments: "<%= strip_tags(submission.comment) %>"
+              <% end %>
+            </p>
+          </div>
+      </div>
+      <hr>
+      <% end %>
+
+      <%#= raw submission.history %>
+      <% submission.histories.order(:created_at).reverse_order.each do |history| %>
+        <%= render 'histories/show', history: history %>
+        <hr />
+      <% end %>
+      <% if false %>
+      <h3>attachments</h3>
+      <% if submission.attachments.empty? %>
+        <p>
+          no attachments yet.
+          </p>
+      <% end %>
+        <% submission.attachments.each_with_index do |attachment, index| %>
+          <%= link_to "#{attachment.filename}", rails_blob_path(attachment, disposition: "attachment") %><br />
+        <% end %>
+        <hr />
+        <h3>blacklisted users</h3>
+        <% if submission.blocked_users.empty? %>
+          <p>
+            no one is blacklisted
+          </p>
+        <% end %>
+          <% submission.blocked_users.each_with_index do |blocked_user, index| %>
+            <%= blocked_user.user.name %><br />
+          <% end %>
+        <% end %>
+        <% if false && !submission.users.empty? %>
+          <h3>internal reviewer</h3>
+          <% submission.users.each do |reviewer| %>
+            <%= reviewer.name %><br />
+          <% end %>
+        <% end %>
+    </div>
+  </div>
+
+  <% if false %>
+      <% if policy(submission).edit? %>
+      <p class="my-2">
+        <%= link_to "edit this submission", edit_submission_path(submission), data: { cy: "edit_submission_button" } %>
+      </p>
+      <% end %>
+
+      <% if policy(submission).destroy? %>
+      <p class="my-2">
+        <%= link_to 'delete this submission', submission, method: :delete, data: { confirm: 'Are you sure?', cy: "delete_submission" } %>
+      </p>
+      <% end %>
+  <% end %>
+
+
+<% else %>
+  <h3>are you an editor or reviewer? <%= link_to('please log in', new_user_session_path, class: "") %></h3>
+<% end %>
+<%#= render 'submissions/current_state', submission: submission %>

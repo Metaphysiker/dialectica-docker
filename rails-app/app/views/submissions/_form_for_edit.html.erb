@@ -1,0 +1,95 @@
+<%= tinymce_assets %>
+<%= tinymce %>
+
+<%= simple_form_for(@submission, html: {data: {cy: "edit_submission_form"}}) do |f| %>
+  <%= f.error_notification %>
+  <%= f.error_notification message: f.object.errors[:base].to_sentence if f.object.errors[:base].present? %>
+
+  <div class="form-inputs">
+    <%= f.input :title, label: "title of paper", placeholder: "Towards a Reformed Liberal and Scientific Naturalism ", required: false %>
+    <%#= f.input :area, collection: Submission.areas.map {|p| [t("#{p}"), p]} %>
+    <%#= f.input :email %>
+    <div class="row">
+        <div class="col-6">
+          <%= f.input :firstname, label: "first name", placeholder: "", required: false %>
+        </div>
+        <div class="col-6">
+          <%= f.input :lastname, label: "last name", placeholder: "", required: false %>
+        </div>
+    </div>
+    <p>
+      <%= f.input :email, label: "email", placeholder: "", required: false %>
+    </p>
+    <p>
+      country
+      <br />
+          <%= f.country_select :country, priority_countries: ["CH", "FR", "GB", "DE", "US"] %>
+    </p>
+
+    <%= f.input :created_at, label: "created_at" %>
+    <%= f.input :appearance_date, label: "appearance date" %>
+    <%= f.input :accepted, label: "accepted?", collection: Submission.accepted_options %>
+    <%= f.input :rejected, label: "rejected?", collection: Submission.rejected_options %>
+    <%= f.input :withdrawn, label: "withdrawn?", collection: Submission.withdrawn_options %>
+    <%= f.input :proposed_for_discussion, label: "proposed for discussion?", collection: Submission.proposed_for_discussion_statuses %>
+
+
+    <%= f.input :dead, label: "dead?", collection: Submission.dead_options %>
+    <%= f.input :dialectica_id, label: "dialectica_id", as: :numeric %>
+    <%#= f.input :gender, label: "gender**", collection: Submission.gender_options.map {|p| [t("#{p}"), p]} %>
+
+    <%= f.input :other_authors, label: "other authors (please provide a complete list)", placeholder: "Laura Smith, Jonas Hamilton, Kim Ruthers" %>
+    <p>
+      <strong>upload file (pdf format) </strong>   - max 1 mb<br />
+      <%= f.file_field :file, label: false %>
+    </p>
+    <% if false %>
+    <p>
+      <strong>history</strong><br />
+        <%= f.text_area :history, :class => "tinymce", :rows => 40, :cols => 120 %>
+    </p>
+    <% end %>
+
+
+    <%#= f.input :blocked_users, as: :select, collection: User.all, label: "blacklist users", required: false, label_method: :name, value_method: :id, input_html: {class: 'chosen-select', :data => {:placeholder => "select users"}, multiple: true} %>
+
+    <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#blacklist_users_option" aria-expanded="false" aria-controls="blacklist_users_option">
+      blacklist users
+    </button>
+      <div class="collapse" id="blacklist_users_option">
+        <div class="card card-body">
+          <%= f.input :blocked_users, as: :select, collection: User.all, label: false, required: false, label_method: :name, value_method: :id, input_html: {class: 'chosen-select', :data => {:placeholder => "select users that should be blacklisted"}, multiple: true} %>
+        </div>
+      </div>
+
+    <% if false %>
+    <p>
+      <strong>comment</strong><br />
+        <%= f.text_area :comment, class: "tinymce", :rows => 10 %>
+    </p>
+    <% end %>
+
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit, class: "btn btn-primary my-2" %>
+  </div>
+
+  <hr />
+  <p>
+    * of primary institutional affiliation (otherwise of residence), for statistical purposes only
+  </p>
+<% end %>
+
+<script>
+    $(document).ready(function(){
+      $('.chosen-select').chosen({
+        allow_single_deselect: true,
+        no_results_text: 'No Results',
+        inherit_select_classes: false,
+        search_contains: true,
+        width: '100%'
+      });
+
+    });
+</script>

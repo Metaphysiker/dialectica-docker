@@ -1,0 +1,120 @@
+<%# json_view_ancestry = json.has_parent? ? json.parent_id : json.id %>
+<%# json.bibtex_entry.blank? %>
+<% if json.has_parent? %>
+  <% json_view_ancestry = json.parent_id %>
+<% elsif !json.bibtex_entry.blank? %>
+  <% json_view_ancestry = json.bibtex_entry.id %>
+<% else %>
+    <% json_view_ancestry = json.id %>
+<% end %>
+
+<div class="json_view json_view_ancestry_<%= json_view_ancestry %>" id="json_view_<%= json.id %>" class="border rounded" json_view_ancestry_id="<%= json_view_ancestry %>">
+  <ul class="nav nav-tabs" id="nav_tabs_json_view_<%= json.id %>" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a class="nav-link active" id="apa_view_<%= json.id %>-tab" data-toggle="tab" href="#apa_view_<%= json.id %>" role="tab" aria-controls="apa_view_<%= json.id %>" aria-selected="true">APA Style</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link " id="bibtex_view_<%= json.id %>-tab" data-toggle="tab" href="#bibtex_view_<%= json.id %>" role="tab" aria-controls="bibtex_view_<%= json.id %>" aria-selected="true">BibTex</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" id="raw_json_view_<%= json.id %>-tab" data-toggle="tab" href="#raw_json_view_<%= json.id %>" role="tab" aria-controls="raw_json_view_<%= json.id %>" aria-selected="false">Raw JSON</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" id="editor_tab_view_<%= json.id %>-tab" data-toggle="tab" href="#editor_tab_view_<%= json.id %>" role="tab" aria-controls="editor_tab_view_<%= json.id %>" aria-selected="false">Editor</a>
+    </li>
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active p-1" id="apa_view_<%= json.id %>" role="tabpanel" aria-labelledby="apa_view_<%= json.id %>-tab">
+      <div class="apa" id="apa_<%= json.id %>">
+
+      </div>
+    </div>
+    <div class="tab-pane fade show p-1" id="bibtex_view_<%= json.id %>" role="tabpanel" aria-labelledby="bibtex_view_<%= json.id %>-tab">
+      <div class="bibtex" id="bibtex_<%= json.id %>">
+
+      </div>
+    </div>
+    <div class="tab-pane fade p-1" id="raw_json_view_<%= json.id %>" role="tabpanel" aria-labelledby="raw_json_view_<%= json.id %>-tab">
+      <div class="raw_json" id="raw_json_<%= json.id %>">
+        <%= json.content %>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="editor_tab_view_<%= json.id %>" role="tabpanel" aria-labelledby="editor_tab_view_<%= json.id %>-tab">
+      <div id="jsoneditor_<%= json.id %>" style="width: 400px; height: 400px;">
+      </div>
+      <button id="json_view_editor_update_<%= json.id %>" type="button" class="btn btn-primary m-1">Update</button>
+    </div>
+  </div>
+
+  <% if local_assigns[:select_option] %>
+    <% if local_assigns[:selected] %>
+      <button type="button" class="select_button_entry_comparator btn btn-success m-1 selected_entry_comparator">Selected</button>
+    <% else %>
+      <button type="button" class="select_button_entry_comparator btn btn-light m-1">Select</button>
+    <% end %>
+  <% end %>
+
+  <script>
+
+    $( document ).ready(function() {
+
+      // create the editor
+      var container = document.getElementById("jsoneditor_<%= json.id %>")
+      var options = {}
+      var editor = new JSONEditor(container, options)
+
+      // set json
+      var initialJson = <%= raw json.content %>
+      editor.set(initialJson)
+
+      //citation.js
+      var Cite = require('citation-js')
+
+      // Set variables
+      var cite = new Cite()
+      var apa_opt = {
+        type: "html",
+        style: "citation-apa",
+        lang: "en-us"
+      }
+
+      var bibtex_opt = {
+        type: "html",
+        style: "bibtex",
+        lang: "en-us"
+      }
+
+      apa = cite.set($("#raw_json_<%= json.id %>").text()).get(apa_opt);
+      $('#apa_<%= json.id %>').html(apa);
+
+      bibtex = cite.set($("#raw_json_<%= json.id %>").text()).get(bibtex_opt);
+      $('#bibtex_<%= json.id %>').html(bibtex);
+
+
+      // Make shorter ref to function
+      //var parseAsync = Cite.parse.input.async.chain
+
+      // Make a factory for callback
+      //var callbackFactory = function (out) {
+        //return function (data) {
+        //  out.html(cite.set(data).get(opt))
+        //}
+      //}
+
+
+       $( "#json_view_editor_update_<%= json.id %>" ).click(function() {
+           $.ajax({
+             url: "/jsons-tools/json_view_editor_update/<%= json.id %>.js",
+             method: 'POST',
+             data: { content: editor.get()},
+             headers: {
+               'X-CSRF-Token': document.querySelector("meta[name=csrf-token]").content
+             }
+           }).done(function(response) {
+           //$(".address-<%= json.id %>-edit-placeholder").replaceWith(response);
+         })
+       });
+
+    });
+  </script>
+</div>

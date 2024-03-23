@@ -1,0 +1,265 @@
+<% if current_user.nil? %>
+<p>
+    <strong>  <%= link_to('Please log in', new_user_session_path) %></strong>
+</p>
+<% end %>
+<% unless current_user.nil? %>
+
+<% if !submission.users.empty? %>
+<div class="row">
+    <div class="col-12">
+      <div class="d-inline-block">
+        <h5>internal reviewers</h5>
+        <% submission.users.each do |reviewer| %>
+          <%= reviewer.name %><br />
+        <% end %>
+      </div>
+  </div>
+</div>
+<hr>
+<% end %>
+
+<div class="row">
+    <div class="col-12">
+      <%#= mail_to "", "send to external referee", subject: "Review for Dialectica", body: "Dear Reviewer \n\n There is a new submission on Dialectica called \"#{submission.title}\". \n\n Please take a look, as it is in your area of expertise! \n\n View it here: #{submission_url(submission)} \n\n Kind regards \n\n #{current_user.name unless current_user.blank?}", class: "btn btn-light border my-2" %>
+      <% if is_user_reviewer?(current_user) %>
+      <h5>reviewer-tools<h5>
+        <%  if current_user.submissions.where(id: submission.id).empty?  %>
+
+
+          <%= link_to "fish this", submissions_add_user_to_submission_path(current_user.id, submission.id), method: :post, class: "btn btn-light border my-2", data: { cy: "submissions_add_user_to_submission" } %>
+          <%#= link_to "I know someone who could review it", submissions_add_user_to_submission_path(current_user.id, submission.id), method: :post, class: "btn btn-success my-2" %>
+          <button type="button" class="btn btn-light border" data-toggle="modal" data-target="#suggestionModal">
+            suggest to internal reviewer
+          </button>
+          <button type="button" class="btn btn-light border" data-toggle="modal" data-target="#uploadfileModal" data-cy="upload_file_button">
+            upload file
+          </button>
+          <button type="button" class="btn btn-light border" data-toggle="modal" data-target="#addCommentModal" data-cy="add_comment_to_submission_button">
+            add comment
+          </button>
+          <%= link_to "add me to blocked users", add_me_to_blocked_users_submission_path(submission.id), method: :post, class: "btn btn-light border my-2", data: { cy: "add_me_to_blocked_users_submission" } %>
+
+        <% else %>
+
+        <%= link_to "leave it", submissions_remove_user_from_submission_path(current_user.id, submission.id), method: :post, class: "btn btn-light border my-2", data: { cy: "submissions_remove_user_to_submission" } %>
+        <button type="button" class="btn btn-light border" data-toggle="modal" data-target="#suggestionModal">
+          suggest to internal reviewer
+        </button>
+        <button type="button" class="btn btn-light border" data-toggle="modal" data-target="#uploadfileModal" data-cy="upload_file_button">
+          upload file
+        </button>
+        <button type="button" class="btn btn-light border" data-toggle="modal" data-target="#addCommentModal" data-cy="add_comment_to_submission_button">
+          add comment
+        </button>
+
+        <%= link_to "contact author", new_question_answer_path(submission_id: submission.id), class: "btn btn-light border" %>
+
+        <%= link_to "send to external referee", send_to_external_referee_external_referee_submissions_path(submission), class: "btn btn-light border" %>
+
+        <%= link_to "prolong life", prolong_life_submission_path(submission), method: :put, class: "btn btn-light border" %>
+
+        <% if false %>
+          <button type="button" class="btn btn-light border" data-toggle="modal" data-target="#send_to_external_refereeModal" data-cy="send_to_external_referee_button">
+            send to external referee
+          </button>
+        <% end %>
+
+          <%#= link_to "suggest to another internal", upload_file_to_submission_path(submission.id), class: "btn btn-light border my-2" %>
+          <%#= link_to "upload file", upload_file_to_submission_path(submission.id), class: "btn btn-light border my-2" %>
+          <%#= submission.proposed.to_s == "false" %>
+          <% unless submission.proposed_for_acceptance.to_s == "true" %>
+            <%= link_to "propose for acceptance", propose_for_acceptance_submission_path(submission.id), method: :put, class: "btn btn-light border my-2" %>
+          <% else %>
+            <%= link_to "propose for acceptance", propose_for_acceptance_submission_path(submission.id), method: :put, class: "btn btn-light border my-2 disabled" %>
+            <%= link_to "unpropose for acceptance", unpropose_for_acceptance_submission_path(submission.id), method: :put, class: "btn btn-light border my-2" %>
+          <% end %>
+
+          <% unless submission.proposed_for_rejection.to_s == "true" %>
+            <%= link_to "propose for rejection", propose_for_rejection_submission_path(submission.id), method: :put, class: "btn btn-light border my-2" %>
+          <% else %>
+            <%= link_to "propose for rejection", propose_for_rejection_submission_path(submission.id), method: :put, class: "btn btn-light border my-2 disabled" %>
+            <%= link_to "unpropose for rejection", unpropose_for_rejection_submission_path(submission.id), method: :put, class: "btn btn-light border my-2" %>
+          <% end %>
+
+
+
+        <% end %>
+      <% end %>
+    </div>
+</div>
+
+<%#= link_to "Suggest to another user", submissions_create_suggestion_to_user_path(current_user.id, submission.id), method: :post, class: "btn btn-success btn-block my-2" %>
+
+
+
+
+  <% if is_user_editor?(current_user) %>
+    <hr />
+    <% if submission.accepted == "true" %>
+        <span class="badge badge-success">submission has been accepted.</span>
+    <% elsif submission.rejected == "true" %>
+      <span class="badge badge-danger">submission has been rejected.</span>
+    <% else %>
+      <h5>editor-tools<h5>
+      <%= link_to "accept", accept_submission_path(submission.id), method: :post, class: "btn btn-light border my-2" %>
+
+      <%#= link_to "reject", reject_submission_path(submission.id), method: :post, class: "btn btn-light border my-2" %>
+      <%= link_to "reject", send_rejection_to_author_form_submission_path(submission.id), method: :get, class: "btn btn-light border my-2" %>
+
+
+      <%= link_to "resurrect", resurrect_submission_path(submission.id), method: :post, class: "btn btn-light border my-2" %>
+
+      <% if policy(submission).edit? %>
+        <%= link_to "edit this submission", edit_submission_path(submission), data: { cy: "edit_submission_button" }, class: "btn btn-light border my-2" %>
+      <% end %>
+
+      <% if policy(submission).destroy? %>
+        <%= link_to 'delete this submission', submission, method: :delete, data: { confirm: 'Are you sure?', cy: "delete_submission" }, class: "btn btn-danger border my-2" %>
+      <% end %>
+      <hr>
+      <% unless submission.proposed_for_acceptance.to_s == "true" %>
+        <%= link_to "propose for acceptance", propose_for_acceptance_submission_path(submission.id), method: :put, class: "btn btn-light border my-2" %>
+      <% else %>
+        <%= link_to "propose for acceptance", propose_for_acceptance_submission_path(submission.id), method: :put, class: "btn btn-light border my-2 disabled" %>
+        <%= link_to "unpropose for acceptance", unpropose_for_acceptance_submission_path(submission.id), method: :put, class: "btn btn-light border my-2" %>
+      <% end %>
+
+      <% unless submission.proposed_for_rejection.to_s == "true" %>
+        <%= link_to "propose for rejection", propose_for_rejection_submission_path(submission.id), method: :put, class: "btn btn-light border my-2" %>
+      <% else %>
+        <%= link_to "propose for rejection", propose_for_rejection_submission_path(submission.id), method: :put, class: "btn btn-light border my-2 disabled" %>
+        <%= link_to "unpropose for rejection", unpropose_for_rejection_submission_path(submission.id), method: :put, class: "btn btn-light border my-2" %>
+      <% end %>
+
+      <% unless submission.proposed_for_discussion.to_s == "true" %>
+        <%= link_to "propose for discussion", propose_for_discussion_submission_path(submission.id), method: :put, class: "btn btn-light border my-2" %>
+      <% else %>
+        <%= link_to "propose for discussion", propose_for_discussion_submission_path(submission.id), method: :put, class: "btn btn-light border my-2 disabled" %>
+        <%= link_to "unpropose for rejection", unpropose_for_discussion_submission_path(submission.id), method: :put, class: "btn btn-light border my-2" %>
+      <% end %>
+
+    <% end %>
+
+  <% end %>
+<%#= link_to "I know someone who could review it", submissions_add_user_to_submission_path(current_user.id, submission.id), method: :post, class: "btn btn-success btn-block my-2" %>
+<% end %>
+
+<!-- Suggestion Modal -->
+<div class="modal fade" id="suggestionModal" tabindex="-1" aria-labelledby="suggestionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="suggestionModalLabel">suggest to internal reviewer </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <%= form_tag submissions_create_suggestion_to_user_path do %>
+          <%#= file_field_tag :file, class: "btn btn-secondary" %>
+          <%= hidden_field_tag :submission_id, submission.id %>
+          <%#= submit_tag "Submit", class: "btn btn-primary", id: "actual_bibtex_enter_button" %>
+          <strong>to whom: </strong> <%= select_tag :user_id, options_for_select(User.available_for_internal_review.not_hidden.order(:lastname).collect{ |u| ["#{u.name} - #{u.email}", u.id] }) %>
+          <br />
+          <br />
+          <%= button_tag "suggest", class: "btn btn-light border" %>
+
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UploadModal -->
+<div class="modal fade" id="uploadfileModal" tabindex="-1" aria-labelledby="uploadfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadfileModalLabel">upload file</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+
+        <%= render "media/form_for_submission", medium: Medium.new, parent: submission %>
+
+      <!--
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+      -->
+    </div>
+  </div>
+</div>
+
+<!-- CommentModal -->
+<div class="modal fade" id="addCommentModal" tabindex="-1" aria-labelledby="addCommentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addCommentModalLabel">add comment</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <%= tinymce_assets %>
+        <%= tinymce %>
+        <%= simple_form_for :comment, url: add_comment_to_submission_path(submission) do |f| %>
+          <%= f.input :comment, as: :text, :input_html => { :rows => 7} %>
+          <%#= f.text_area :comment, :class => "tinymce", :rows => 40, :cols => 120 %>
+
+
+
+      </div>
+      <div class="modal-footer">
+        <%= f.submit "make comment", class: "btn btn-primary border my-2", data: {cy: "submit_comment_to_submission_button"} %>
+      </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- send_to_external_refereeModal -->
+<div class="modal fade" id="send_to_external_refereeModal" tabindex="-1" aria-labelledby="send_to_external_refereeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="send_to_external_refereeModalLabel">send this out</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <%#= render 'external_referee_submissions/send_to_external_referee', submission: submission %>
+        <%#= mail_to "", "send to external referee", subject: "Review for Dialectica", body: "Dear Reviewer \n\n There is a new submission on Dialectica called \"#{submission.title}\". \n\n Please take a look, as it is in your area of expertise! \n\n View it here: #{submission_url(submission)} \n\n Kind regards \n\n #{current_user.name unless current_user.blank?}", class: "btn btn-light border my-2" %>
+      </div>
+      <!--
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">dismiss</button>
+      </div>
+      -->
+    </div>
+  </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+      $('.chosen-select').chosen({
+        no_results_text: 'No Results',
+        inherit_select_classes: false,
+        search_contains: true,
+        width: '100%'
+      });
+
+      $('#addCommentModal').on('shown.bs.modal', function() {
+          $(document).off('focusin.modal');
+      });
+
+    });
+</script>

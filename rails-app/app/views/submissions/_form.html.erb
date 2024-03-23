@@ -1,0 +1,105 @@
+<%= tinymce_assets %>
+<%= tinymce %>
+
+<%= simple_form_for(@submission, html: {data: {cy: "new_submission_form"}}) do |f| %>
+  <%= f.error_notification %>
+  <%= f.error_notification message: f.object.errors[:base].to_sentence if f.object.errors[:base].present? %>
+
+  <div class="form-inputs">
+    <%= f.input :title, label: "title of paper", placeholder: "", required: false %>
+    <%#= f.input :area, collection: Submission.areas.map {|p| [t("#{p}"), p]} %>
+    <%#= f.input :email %>
+    <div class="row">
+        <div class="col-6">
+          <%= f.input :firstname, label: "first name", placeholder: "", required: false %>
+        </div>
+        <div class="col-6">
+          <%= f.input :lastname, label: "last name", placeholder: "", required: false %>
+        </div>
+    </div>
+    <p>
+      <%= f.input :email, label: "email", placeholder: "", required: false %>
+    </p>
+    <p>
+      country
+      <br />
+      <%= f.country_select :country, priority_countries: ["CH", "FR", "GB", "IT", "DE", "ES", "US"], required: false %>
+    </p>
+
+
+    <%#= f.input :gender, label: "gender**", collection: Submission.gender_options.map {|p| [t("#{p}"), p]} %>
+
+    <%= f.input :other_authors, label: "other authors (please provide a complete list)", placeholder: "" %>
+    <p>
+      <strong>upload file (pdf format) </strong>  - max 1 mb<br />
+      <%#= f.file_field :file %>
+      <%= f.input :file, label: false %>
+    </p>
+    <% if false %>
+    <p>
+      <strong>history</strong><br />
+        <%= f.text_area :history, :class => "tinymce", :rows => 40, :cols => 120 %>
+    </p>
+    <% end %>
+
+    <%#= f.input :blocked_users, as: :select, collection: User.all, label: "blacklist users", required: false, label_method: :name, value_method: :id, input_html: {class: 'chosen-select', :data => {:placeholder => "select users"}, multiple: true} %>
+
+  <div class="<%= "d-none" unless user_signed_in? %>"
+    <br>
+    <button class="btn btn-primary mb-3" type="button" data-toggle="collapse" data-target="#blacklist_users_option" aria-expanded="false" aria-controls="blacklist_users_option">
+      blacklist members of the Editorial Committee as internal referees
+    </button>
+
+    <div class="collapse" id="blacklist_users_option">
+      <div class="card card-body">
+        <br />
+        <%= f.input :blocked_users, as: :select, collection: User.reviewers.not_hidden.order(:lastname), label: false, required: false, label_method: :name, value_method: :id, input_html: {class: 'chosen-select', :data => {:placeholder => "select users that should be blacklisted"}, multiple: true} %>
+      </div>
+    </div>
+    <br>
+    <br>
+  </div>
+
+
+  <p>
+    This is a resubmission of an article previously submitted to <i>Dialectica</i> and which received the number:
+    <br>
+    <div class="" style="width: 100px;">
+      <%= f.input :resubmit_original_dialectica_id, label: false  %>
+    </div>
+  </p>
+
+    <% if false %>
+    <p>
+      <strong>comments</strong><br />
+        <%= f.text_area :comment, class: "tinymce", :rows => 10 %>
+    </p>
+    <% end %>
+
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit, "submit", class: "btn btn-primary my-2" %>
+  </div>
+
+
+  <p class="mt-3">
+    * of primary institutional affiliation (otherwise of residence), for statistical purposes only
+  </p>
+    <hr />
+    <%= render "web_site_contents/show_with_identifier", identifier: "submission_conditions" %>
+
+<% end %>
+
+<script>
+    $(document).ready(function(){
+      $('.chosen-select').chosen({
+        allow_single_deselect: true,
+        no_results_text: 'No Results',
+        inherit_select_classes: false,
+        search_contains: true,
+        width: '100%'
+      });
+
+    });
+</script>

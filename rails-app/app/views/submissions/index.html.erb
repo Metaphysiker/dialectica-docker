@@ -1,0 +1,44 @@
+<%= render "layouts/fishpond_navigation" %>
+
+<div class="container">
+
+<h1>submissions</h1>
+
+<div class="row">
+  <div class="col-sm-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">download csv</h5>
+          <%= link_to "download csv with all submissions", submissions_download_csv_path, data: {cy: "download_csv_submission_button"} %>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">upload csv</h5>
+        <%= form_tag submissions_upload_csv_path, multipart: true, data: {cy: "upload_csv_form"} do %>
+
+          <%= file_field_tag :file, id: "upload_csv_field_tag" %>
+          <br />
+          <br />
+          <%= button_tag "upload csv", class: "btn btn-light border" %>
+
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<hr>
+
+<%#= render 'submissions/table_for_submissions', submissions: @submissions %>
+<%= render 'submissions/searchable_list', submissions: @submissions %>
+
+<%= link_to 'New Submission', new_submission_path %>
+<br>
+<br>
+</div>
+
+<%= render "layouts/footer" %>

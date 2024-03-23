@@ -1,0 +1,28 @@
+<%= tinymce_assets %>
+<%= tinymce %>
+
+<%= simple_form_for(@page) do |f| %>
+  <%= f.error_notification %>
+  <%= f.error_notification message: f.object.errors[:base].to_sentence if f.object.errors[:base].present? %>
+
+  <div class="form-inputs">
+    <p>
+      Cover <br />
+      <%= f.file_field :cover %>
+    </p>
+
+    <%= f.input :title %>
+    <%= f.input :description %>
+    <%= f.input :slug %>
+    <%= f.input :special_page %>
+    <%= f.input :status, collection: Page.status_options %>
+    <%#= f.input :sort %>
+    <%#= f.input :keywords %>
+    <%= f.text_area :content, :class => "tinymce", :rows => 10 %>
+    <%#= f.input :search_field %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit, class: "btn btn-primary my-2" %>
+  </div>
+<% end %>
